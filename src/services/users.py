@@ -1,4 +1,4 @@
-from src.schemas import UserResponse, UserRequest
+from src.schemas import UserRequest
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import User
 from sqlalchemy.future import select
@@ -13,7 +13,6 @@ async def create_user(body: UserRequest, session: AsyncSession):
     if await find_user_by_email_and_username(body.email, body.username, session):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User Already Exist!")
     
-    print("HEllo")
     body_dict = body.model_dump()
     del body_dict["password"]
     user = User(**body_dict, password_hash=hash_password(body.password))

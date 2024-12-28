@@ -1,5 +1,15 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from datetime import datetime
 
 class RoomBase(BaseModel):
-    name: str
+    name: str = Field(min_length=3, max_length=20)
+
+class RoomResponse(RoomBase):
+    id: str
+    
+    created_at: datetime
+    modified_at: datetime
+
+    class Config:
+        orm_mode = True 

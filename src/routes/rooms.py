@@ -1,16 +1,20 @@
 
-from fastapi import APIRouter, status
-from fastapi.exceptions import HTTPException
+from fastapi import APIRouter, status, Depends
+from src.schemas import RoomBase, RoomResponse
+from src.services import RoomService
+from typing import List
+from src.dependencies import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_room():
-    return {"message": "Room created successfully"}
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=RoomResponse)
+async def create_room(room: RoomBase, session: AsyncSession = Depends(get_db)):
+    return await RoomService.create_room(room, session)
 
-@router.get("/")
-async def get_rooms():
-    return {"message": "Rooms retrieved successfully"}
+@router.get("/", response_model=List[RoomResponse])
+async def get_rooms(session: AsyncSession = Depends(get_db)):
+    return await RoomService.list_rooms(session)
 
 @router.post("/{room_id}/messages/", status_code=status.HTTP_201_CREATED)
 async def send_message(room_id: int):
