@@ -1,4 +1,5 @@
 __pycache__/
+versions/
 .venv
 *.sqlite
 *.db

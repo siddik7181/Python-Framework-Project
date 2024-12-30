@@ -3,7 +3,7 @@ from src.schemas import UserLogin, UserResponse
 
 from datetime import timedelta, datetime, timezone
 
-from src.dependencies import get_db
+from src.dependencies import get_db, get_auth_user
 from src.services import UserService
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,7 @@ async def login(body: UserLogin,response: Response, session: AsyncSession = Depe
     )
     return user
 
-@router.post("/logout/", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_auth_user)])
 async def logout(response: Response):
     response.delete_cookie(key="session_id")
     response.set_cookie(key="session_id", value="", expires=0) 
