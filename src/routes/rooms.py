@@ -1,12 +1,12 @@
 
 from fastapi import APIRouter, status, Depends
-from src.schemas import RoomCreate, RoomResponse, MessageBase, MessageOut, MessageCreate, MessageUpdate
+from src.schemas import RoomCreate, RoomResponse, MessageBase, MessageOut, MessageCreate, MessageUpdate, UserResponse
 from src.services import RoomService, MessageService
 from typing import List
-from src.dependencies import get_db
+from src.dependencies import get_db, get_auth_user
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="/rooms", tags=["rooms"])
+router = APIRouter(prefix="/rooms", tags=["rooms"], dependencies=[Depends(get_auth_user)])
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=RoomResponse)
 async def create_room(room: RoomCreate, session: AsyncSession = Depends(get_db)):
@@ -26,7 +26,8 @@ async def get_messages(room_id: str, session: AsyncSession = Depends(get_db)):
     return await MessageService.list_messages_by_room(room_id, session)
 
 @router.delete("/{room_id}/messages/{message_id}/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_message(room_id: str, message_id: str, user_id: str, session: AsyncSession = Depends(get_db)):
+async def delete_message(room_id: str, message_id: str, current_user: UserResponse = Depends(get_auth_user), session: AsyncSession = Depends(get_db)):
+    user_id = current_user.id
     await MessageService.find_by_msg_id_and_del_by_super_user(message_id, user_id, session)
     return {"message": f"Message {message_id} deleted from room {room_id}"}
 

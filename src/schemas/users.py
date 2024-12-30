@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -15,6 +15,8 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
+    
 
 class UserInDb(UserResponse):
     password_hash: str

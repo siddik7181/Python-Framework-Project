@@ -1,4 +1,4 @@
-from src.schemas import UserRequest
+from src.schemas import UserRequest, UserLogin
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import User
 from sqlalchemy.future import select
@@ -39,6 +39,13 @@ async def find_user_by_username(username: str, session: AsyncSession):
     
 async def find_user_by_email_and_username(email, username, session: AsyncSession):
     return await find_user_by_email(email, session) or await find_user_by_username(username, session)
+
+
+async def login_user(body: UserLogin, session: AsyncSession):
+    user = await find_user_by_username(body.username, session)
+    if not user or hash_password(body.password) != user.password_hash:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid Credentials")
+    return user
 
 
 async def update_by_id(id: str, body: UserRequest, session: AsyncSession):
