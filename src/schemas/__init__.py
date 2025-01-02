@@ -2,4 +2,4 @@ from .users import UserBase, UserRequest, UserResponse, UserUpdate, UserLogin, U
 from .rooms import RoomBase, RoomResponse, RoomCreate
 from .messages import MessageBase, MessageCreate, MessageOut, MessageUpdate
 
-from .token import Token
+from .common import CommonFilters

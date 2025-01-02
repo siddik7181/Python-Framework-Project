@@ -1,12 +1,14 @@
 
-from src.schemas import RoomCreate
+from src.schemas import RoomCreate, CommonFilters
 from src.models import Room
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select, desc
 
 from fastapi.exceptions import HTTPException
 from fastapi import status
+
+from .common import CommonService
 
 class RoomService:
 
@@ -21,9 +23,8 @@ class RoomService:
         return room
 
     @classmethod
-    async def list_rooms(cls, session: AsyncSession):
-        rooms = await session.execute(select(Room))
-        return rooms.scalars()
+    async def list_rooms(cls, filters: CommonFilters, session: AsyncSession):
+        return await CommonService.list(Room, filters, session)
 
     @classmethod
     async def find_room_by_id(cls, id: str, session: AsyncSession):

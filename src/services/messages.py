@@ -1,13 +1,14 @@
-from src.schemas import MessageCreate, MessageUpdate
+from src.schemas import MessageCreate, MessageUpdate, CommonFilters
 from src.models import Message
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select, desc
 
 from fastapi.exceptions import HTTPException
 from fastapi import status
 
 from .users import UserService
+from .common import CommonService
 
 class MessageService:
 
@@ -19,10 +20,12 @@ class MessageService:
         return new_msg
 
     @classmethod
-    async def list_messages_by_room(cls, room_id: str, session: AsyncSession):
-        stmt = select(Message).where(Message.room_id == room_id)
+    async def list_messages_by_room(cls, room_id: str, filters: CommonFilters, session: AsyncSession):
+        stmt = select(Message).where(Message.room_id == room_id).offset(filters.offset).limit(filters.page_size)
+        if filters.sort_by:
+            stmt = stmt.order_by(desc(filters.sort_by)) if filters.order == "desc" else stmt.order_by(filters.sort_by)
         messages = await session.execute(stmt)
-        return messages.scalars()
+        return messages.scalars().all()
 
     @classmethod
     async def get_message_by_id(cls, id: str, session: AsyncSession):

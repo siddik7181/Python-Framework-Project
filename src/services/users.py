@@ -1,11 +1,12 @@
-from src.schemas import UserRequest
+from src.schemas import UserRequest, CommonFilters
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import User
-from sqlalchemy.future import select
+from sqlalchemy import select
 
 from fastapi.exceptions import HTTPException
 from fastapi import status
 
+from .common import CommonService
 
 class UserService:
 
@@ -30,9 +31,8 @@ class UserService:
         return user
 
     @classmethod
-    async def user_list(cls, session: AsyncSession):
-        users = await session.execute(select(User))
-        return users.scalars()
+    async def user_list(cls, filters: CommonFilters, session: AsyncSession):
+        return await CommonService.list(User, filters, session)
 
     @classmethod
     async def find_user_by_id(cls, id: str, session: AsyncSession):
