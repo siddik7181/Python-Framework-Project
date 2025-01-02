@@ -3,10 +3,10 @@ from fastapi import APIRouter, status, Depends
 from src.schemas import RoomCreate, RoomResponse, MessageBase, MessageOut, MessageCreate, MessageUpdate
 from src.services import RoomService, MessageService
 from typing import List
-from src.dependencies import get_db
+from src.dependencies import get_db, get_requesting_user
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="/rooms", tags=["rooms"])
+router = APIRouter(prefix="/rooms", tags=["rooms"], dependencies=[Depends(get_requesting_user)])
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=RoomResponse)
 async def create_room(room: RoomCreate, session: AsyncSession = Depends(get_db)):
