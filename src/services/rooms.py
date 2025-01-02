@@ -1,5 +1,5 @@
 
-from src.schemas import RoomBase
+from src.schemas import RoomCreate
 from src.models import Room
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,7 @@ from fastapi import status
 class RoomService:
 
     @classmethod
-    async def create_room(cls, body: RoomBase, session: AsyncSession):
+    async def create_room(cls, body: RoomCreate, session: AsyncSession):
         if await cls.find_room_by_name(body.name, session):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Choose a different room name!")
         

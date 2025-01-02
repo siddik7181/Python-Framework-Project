@@ -14,18 +14,16 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def create_user(body: UserRequest, session: AsyncSession = Depends(get_db)):
     return await UserService.create_user(body, session)
 
-@router.get("/{user_id}", response_model=UserResponse)
-async def read_user_by_id(user_id: str, session: AsyncSession = Depends(get_db)):
-    return await UserService.find_user_by_id(user_id, session)
+@router.get("/", response_model=UserResponse)
+async def read_current_user(current_user: UserResponse = Depends(get_requesting_user), session: AsyncSession = Depends(get_db)):
+    return await UserService.find_user_by_id(current_user.id, session)
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/list", response_model=List[UserResponse])
 async def read_users(session: AsyncSession = Depends(get_db), requesting_user: UserResponse = Depends(get_requesting_user)):
     if not requesting_user.is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to list all users")
     return await UserService.user_list(session)
 
-@router.patch("/{user_id}", response_model=UserResponse)
-async def update_user(user_id: str, body: UserUpdate, session: AsyncSession = Depends(get_db), requesting_user: UserResponse = Depends(get_requesting_user)):
-    if requesting_user.id != user_id and not requesting_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to update other users")
-    return await UserService.update_by_id(user_id, body, session)
+@router.patch("/", response_model=UserResponse)
+async def update_user(body: UserUpdate, session: AsyncSession = Depends(get_db), requesting_user: UserResponse = Depends(get_requesting_user)):
+    return await UserService.update_by_id(requesting_user.id, body, session)

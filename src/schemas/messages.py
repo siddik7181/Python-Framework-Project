@@ -4,15 +4,13 @@ from datetime import datetime
 
 class MessageBase(BaseModel):
     message: str
-    author_id: str
 
 class MessageCreate(MessageBase):
+    author_id: str
     room_id: str
 
-class MessageOut(MessageBase):
+class MessageOut(MessageCreate):
     id: str
-    room_id: str
-    author_id: str
 
     created_at: datetime
     modified_at: datetime
