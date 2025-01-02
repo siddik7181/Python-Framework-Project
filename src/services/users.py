@@ -55,6 +55,13 @@ class UserService:
         return await cls.find_user_by_email(email, session) or await cls.find_user_by_username(username, session)
 
     @classmethod
+    async def authenticate_user(cls, username: str, password: str, session: AsyncSession):
+        user = await cls.find_user_by_username(username, session)
+        if not user or not cls.verify_password(password, user.password_hash):
+            None
+        return user
+
+    @classmethod
     async def update_by_id(cls, id: str, body: UserRequest, session: AsyncSession):
         user = await cls.find_user_by_id(id,session)
 

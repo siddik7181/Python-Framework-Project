@@ -4,12 +4,11 @@ from datetime import datetime
 
 class RoomBase(BaseModel):
     name: str = Field(min_length=3, max_length=20)
-    owner_id: str
 
 class RoomCreate(RoomBase):
-    pass
+    owner_id: str
 
-class RoomResponse(RoomBase):
+class RoomResponse(RoomCreate):
     id: str
     
     created_at: datetime
